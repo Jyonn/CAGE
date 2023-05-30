@@ -1,6 +1,3 @@
-import warnings
-
-import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -14,39 +11,34 @@ class C5(C5Module):
     """
     def __init__(
             self,
-            embed_dim,
-            vocab_size,
-            num_layers=None,
-            cluster_sizes=None,  # ex. [100, 10]
-            weighted_add=1,  # alpha
-            commitment_cost=0.25,  # beta
-            layer_connect=False,
-            layer_loss=True,
+            dim,
+            ways=None,  # ex. [100, 10]
+            alpha=1,  # alpha
+            beta=0.25,  # beta
     ):
         super().__init__()
 
-        if cluster_sizes is not None and not isinstance(cluster_sizes, list):
-            cluster_sizes = str(cluster_sizes)
-            cluster_sizes = [int(x) for x in cluster_sizes.split('-')]
+        if ways is not None and not isinstance(ways, list):
+            ways = str(ways)
+            ways = [int(x) for x in ways.split('-')]
 
-        self.embed_dim = embed_dim
-        self.vocab_size = vocab_size
-        self.num_layers = num_layers  # type: int
-        self.cluster_sizes = cluster_sizes  # type: list[int]
-        self.weighted_add = weighted_add
-        self.commitment_cost = commitment_cost
-        self.layer_connect = layer_connect
-        self.layer_loss = layer_loss
+        self.embed_dim = dim
+        self.vocab_size = 1
+        self.num_layers = -1  # type: int
+        self.cluster_sizes = ways  # type: list[int]
+        self.weighted_add = alpha
+        self.commitment_cost = beta
+        self.layer_connect = True
+        self.layer_loss = True
 
-        assert vocab_size >= 1, "vocab_size must be greater than 1"
-        assert cluster_sizes is not None or num_layers is not None, "num_layers or cluster_sizes must be specified"
+        assert ways is not None, "cluster_sizes must be specified"
 
         self.set_cluster_size()
 
         # construct codebooks
         self.codebooks = nn.ModuleList()  # ex. [nn.Embedding(4, D), nn.Embedding(2, D)]
         for i in range(self.num_layers):
-            self.codebooks.append(nn.Embedding(self.cluster_sizes[i], embed_dim))
+            self.codebooks.append(nn.Embedding(self.cluster_sizes[i], dim))
 
         # layers for classification
         self.transform_layer = TransformLayer(
@@ -66,16 +58,8 @@ class C5(C5Module):
             ))
 
     def set_cluster_size(self):
-        if self.cluster_sizes is not None:
-            self.num_layers = len(self.cluster_sizes)
-            return
-
+        self.num_layers = len(self.cluster_sizes)
         assert self.num_layers >= 0 and isinstance(self.num_layers, int), "num_layers must be a non-negative integer"
-
-        # calculate cluster sizes
-        if 2 ** self.num_layers > self.vocab_size:
-            warnings.warn(f"num_layers is too large, set to {self.num_layers}")
-            self.num_layers = int(np.log2(self.vocab_size))
 
         top_cluster_size = int(self.vocab_size ** (1.0 / (self.num_layers + 1)) + 0.5)
         self.cluster_sizes = [top_cluster_size]  # ex. [2]
