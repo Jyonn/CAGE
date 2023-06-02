@@ -12,26 +12,26 @@ class Cadre(C5Module):
     def __init__(
             self,
             dim,
-            ways=None,  # ex. [100, 10]
+            entries=None,  # ex. [100, 10]
             alpha=1,  # alpha
             beta=0.25,  # beta
     ):
         super().__init__()
 
-        if ways is not None and not isinstance(ways, list):
-            ways = str(ways)
-            ways = [int(x) for x in ways.split('-')]
+        if entries is not None and not isinstance(entries, list):
+            entries = str(entries)
+            entries = [int(x) for x in entries.split('-')]
 
         self.embed_dim = dim
         self.vocab_size = 1
         self.num_layers = -1  # type: int
-        self.cluster_sizes = ways  # type: list[int]
+        self.cluster_sizes = entries  # type: list[int]
         self.weighted_add = alpha
         self.commitment_cost = beta
         self.layer_connect = True
         self.layer_loss = True
 
-        assert ways is not None, "cluster_sizes must be specified"
+        assert entries is not None, "cluster_sizes must be specified"
 
         self.set_cluster_size()
 

@@ -32,7 +32,7 @@ class BaseRecommender(nn.Module):
         # first line: C5 initialization
         self.cadre = Cadre(
             dim=config.dim,
-            ways=config.ways,
+            entries=config.entries,
             alpha=config.alpha,
             beta=config.beta,
         )
