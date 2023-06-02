@@ -12,13 +12,13 @@ class BaseRecommenderConfig:
     def __init__(
             self,
             dim=64,  # embedding dimension
-            ways=None,  # vocabulary sizes per layer
+            entries=None,  # code entries per layer
             alpha=1.0,  # weighted add
             beta=1.0,  # commitment cost
             omega=1.0,  # quantization loss weight
     ):
         self.dim = dim
-        self.ways = ways
+        self.entries = entries
         self.alpha = alpha
         self.beta = beta
         self.omega = omega
@@ -29,7 +29,7 @@ class BaseRecommender(nn.Module):
         super(BaseRecommender, self).__init__()
         self.config = config
 
-        # first line: C5 initialization
+        # first line: module initialization
         self.cadre = Cadre(
             dim=config.dim,
             entries=config.entries,
@@ -49,7 +49,7 @@ class BaseRecommender(nn.Module):
         out = self.enc(item_embs, user_embs)
         loss = self.pred(out)
 
-        # third line: update loss
+        # third line: loss updating
         return loss + qloss * self.conf.omega
 
     def pred(self, out) -> torch.Tensor:
