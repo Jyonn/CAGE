@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from common import TransformLayer, DecoderLayer, C5Quantization, C5Classification, C5Module
 
 
-class C5(C5Module):
+class Cadre(C5Module):
     """
     Cascade Clusterer
     """

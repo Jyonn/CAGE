@@ -1,11 +1,11 @@
-# C5 Module
+# CADRE Module
 
 ## Usage
 
 ```python
 import torch
 from torch import nn
-from c5rec import C5
+from cadre import Cadre
 
 
 class BaseRecommenderConfig:
@@ -30,7 +30,7 @@ class BaseRecommender(nn.Module):
         self.config = config
 
         # first line: C5 initialization
-        self.c5 = C5(
+        self.cadre = Cadre(
             dim=config.dim,
             ways=config.ways,
             alpha=config.alpha,
@@ -44,7 +44,7 @@ class BaseRecommender(nn.Module):
         user_embs = self.get_user_embs(users)
 
         # second line: embedding quantization
-        item_embs, qloss = self.c5(item_embs)
+        item_embs, qloss = self.cadre(item_embs)
 
         out = self.enc(item_embs, user_embs)
         loss = self.pred(out)
