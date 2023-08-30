@@ -3,7 +3,7 @@ from torch import nn
 from transformers.activations import ACT2FN
 
 
-class C5Quantization:
+class CoveQuantization:
     def __init__(self, embeds, loss=None, indices=None):
         self.embeds = embeds
         self.loss = loss
@@ -17,26 +17,26 @@ class C5Quantization:
             self.mean = 0
 
 
-class C5Classification:
+class CoveClassification:
     def __init__(self, scores, layer_loss=None, indices=None):
         self.scores = scores
         self.indices = indices
         self.layer_loss = layer_loss
 
 
-class C5Module(nn.Module):
+class CoveModule(nn.Module):
     def quantize(
             self,
             embeds,
             with_loss=False,
-    ) -> C5Quantization:
+    ) -> CoveQuantization:
         raise NotImplementedError
 
     def classify(
             self,
             embeds,
             indices=None,
-    ) -> C5Classification:
+    ) -> CoveClassification:
         raise NotImplementedError
 
 

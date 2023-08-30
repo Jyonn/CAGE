@@ -2,10 +2,10 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from common import TransformLayer, DecoderLayer, C5Quantization, C5Classification, C5Module
+from common import TransformLayer, DecoderLayer, CoveQuantization, CoveClassification, CoveModule
 
 
-class Cadre(C5Module):
+class Cove(CoveModule):
     """
     Cascade Clusterer
     """
@@ -71,7 +71,7 @@ class Cadre(C5Module):
             self,
             embeds,
             with_loss=False,
-    ) -> C5Quantization:
+    ) -> CoveQuantization:
         compare_embeds = embeds  # for loss calculation
 
         shape = embeds.shape
@@ -90,7 +90,7 @@ class Cadre(C5Module):
             if self.layer_connect:
                 embeds = inner_embeds
 
-        output = C5Quantization(qembeds, indices=qindices)
+        output = CoveQuantization(qembeds, indices=qindices)
         if output.mean != 0:
             output.mean += embeds * self.weighted_add
 
@@ -111,7 +111,7 @@ class Cadre(C5Module):
             self,
             embeds,
             indices=None,
-    ) -> C5Classification:
+    ) -> CoveClassification:
         embeds = self.transform_layer(embeds)
         scores = self.decoder_layer(embeds)
 
@@ -122,7 +122,7 @@ class Cadre(C5Module):
                 if self.layer_loss:
                     cls_loss += F.cross_entropy(layer_scores, indices[i].view(-1), reduction='mean')
 
-        return C5Classification(scores, layer_loss=cls_loss)
+        return CoveClassification(scores, layer_loss=cls_loss)
 
     def __call__(self, *args, **kwargs):
         return self.quantize(*args, **kwargs)
