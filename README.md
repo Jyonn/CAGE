@@ -1,14 +1,14 @@
-# Cove Module
+# Cage Module
 
 ## Usage
 
 ```python
 import torch
 from torch import nn
-from cove import Cove
+from cage import Cage
 
 
-class CoveConfig:
+class CageConfig:
     def __init__(
             self,
             dim=64,  # embedding dimension
@@ -26,21 +26,21 @@ class BaseRecommender(nn.Module):
     def __init__(self, user_config, item_config, omega=1.0):
         super(BaseRecommender, self).__init__()
 
-        # cove initialization
-        self.item_cove = Cove(
+        # cage initialization
+        self.item_cage = Cage(
             dim=item_config.dim,
             entries=item_config.entries,
             alpha=item_config.alpha,
             beta=item_config.beta,
         )
-        
-        self.user_cove = Cove(
+
+        self.user_cage = Cage(
             dim=user_config.dim,
             entries=user_config.entries,
             alpha=user_config.alpha,
             beta=user_config.beta,
         )
-        
+
         self.omega = omega
 
         self.enc = ...
@@ -50,8 +50,8 @@ class BaseRecommender(nn.Module):
         user_embs = self.get_user_embs(users)
 
         # second line: embedding quantization
-        item_embs, item_loss = self.item_cove(item_embs)
-        user_embs, user_loss = self.user_cove(user_embs)
+        item_embs, item_loss = self.item_cage(item_embs)
+        user_embs, user_loss = self.user_cage(user_embs)
 
         out = self.enc(item_embs, user_embs)
         loss = self.pred(out)

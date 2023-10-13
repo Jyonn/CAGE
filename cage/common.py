@@ -3,7 +3,7 @@ from torch import nn
 from transformers.activations import ACT2FN
 
 
-class CoveQuantization:
+class CageQuantization:
     def __init__(self, embeds, loss=None, indices=None):
         self.embeds = embeds
         self.loss = loss
@@ -17,26 +17,26 @@ class CoveQuantization:
             self.mean = 0
 
 
-class CoveClassification:
+class CageClassification:
     def __init__(self, scores, layer_loss=None, indices=None):
         self.scores = scores
         self.indices = indices
         self.layer_loss = layer_loss
 
 
-class CoveModule(nn.Module):
+class CageModule(nn.Module):
     def quantize(
             self,
             embeds,
             with_loss=False,
-    ) -> CoveQuantization:
+    ) -> CageQuantization:
         raise NotImplementedError
 
     def classify(
             self,
             embeds,
             indices=None,
-    ) -> CoveClassification:
+    ) -> CageClassification:
         raise NotImplementedError
 
 
